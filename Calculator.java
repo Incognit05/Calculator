@@ -31,16 +31,18 @@ public class Calculator {
         window.setResizable(false);
         window.setSize(width, height);
         window.setVisible(true);
-        window.getContentPane().setBackground(Color.GRAY);
+        window.getContentPane().setBackground(Color.DARK_GRAY);
 
-        int tx = (int) (width * 0.08);
-        int ty = (int) (height * 0.05);
-        int tw = (int) (width * 0.8);
+        int tx = 0;// (int) (width * 0.08);
+        int ty = 0;// (int) (height * 0.03);
+        int tw = width;// (int) (width * 0.8);
         int th = (int) (height * 0.1);
         textField = new JTextField();
         textField.setEditable(false);
         textField.setBounds(tx, ty, tw, th);
         textField.setHorizontalAlignment(JTextField.LEFT);
+        textField.setBackground(Color.LIGHT_GRAY);
+        textField.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         textField.setVisible(true);
         window.add(textField);
 
@@ -113,26 +115,28 @@ public class Calculator {
         };
 
         int yOff = ty + th;
-        int bw = width / BUTTON_COLS;
-        int bh = (int) (height - (2 * ty + th)) / BUTTON_ROWS;
+        int bw = (int) (width / (BUTTON_COLS));
+        int bh = (int) (height - yOff) / BUTTON_ROWS;
 
         for (int i = 0; i < NUM_BUTTONS; i++) {
             JButton b = buttons[i];
             b.setVisible(true);
+            b.setBackground(Color.LIGHT_GRAY);
+            b.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
             int col = i % BUTTON_COLS;
             int row = Math.floorDiv(i, 4);
 
-            int marginW = (int) (bw * 0.1);
-            int marginH = (int) (bh * 0.1);
+            // int marginW = (int) (bw * 0.1);
+            // int marginH = (int) (bh * 0.1);
 
-            // TODO: construct button shape from center
-
-            b.setBounds(
-                    (int) (col * bw + marginW),
-                    (int) ((row * bh + yOff) + marginH),
-                    (int) (bw - marginW * 0.5),
-                    (int) (bh - marginH * 0.5));
+            b.setLocation(col * bw, row * bh + yOff);
+            b.setSize(bw, bh);
+            // b.setBounds(
+            // (int) (col * bw + marginW * 0.5),
+            // (int) ((row * bh + yOff) + marginH * 0.5),
+            // (int) (bw - marginW * 2),
+            // (int) (bh - marginH * 2));
             window.add(b);
         }
         window.repaint();
@@ -149,6 +153,10 @@ public class Calculator {
 
     private void deleteButtonPressed() {
         String t = textField.getText();
+
+        if (t.equals(""))
+            return;
+
         t = t.substring(0, t.length() - 1);
         textField.setText(t);
     }
@@ -158,6 +166,7 @@ public class Calculator {
     }
 
     private void equalsButtonPressed() {
-        System.out.println("Solve!");
+        String equation = textField.getText();
+        textField.setText(Solver.solve(equation));
     }
 }
