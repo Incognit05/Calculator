@@ -1,66 +1,104 @@
+import java.util.ArrayList;
+
 public class Solver {
 
-    private class Expression {
-        public String numberA;
-        public String numberB;
-        public char operation;
+    public static String solve(String equation) {
+        char[] tokens = equation.toCharArray();
+        ArrayList<String> list = new ArrayList<String>();
 
-        public Expression(String numA, char op, String numB) {
-            numberA = numA;
-            numberB = numB;
-            operation = op;
-        }
-    }
+        String s = "";
+        String numA = "";
+        String numB = "";
+        String operator = "";
 
-    public static String solve(String expression) {
-        char[] tokens = expression.toCharArray();
-
-        char operation = ' ';
-        String result = "";
-        String[] numbers = new String[] { "", "" };
-        int numberIndex = 0;
+        boolean operationOnQueue = false;
 
         for (int i = 0; i < tokens.length; i++) {
             char token = tokens[i];
-            if (Character.isDigit(token) || token == '.') {
-                numbers[numberIndex] += token;
+            // token is a number
+            if (Character.isDigit(token) || token == '.'
+            // - for negative numbers
+                    || (i == 0 && token == '-')
+                    || (token == '-' && !Character.isDigit(tokens[i - 1]))) {
+                s += token;
             } else {
-                operation = token;
-                numberIndex = numberIndex == 0 ? 1 : 0;
+                // token is an operator
+
+                // add current number to list
+                list.add(s);
+                // add operator
+                list.add(token + "");
+
+                // if operation is on queue, then pre compute it
+                if (operationOnQueue) {
+                    operationOnQueue = false;
+
+                    numB = s;
+                    list.set(list.lastIndexOf(numA), eval(numA, operator, numB));
+                    list.remove(list.lastIndexOf(operator));
+                    list.remove(list.lastIndexOf(numB));
+                }
+
+                // if mul or div, then add to queue
+                if (token == '*' || token == '/') {
+                    operationOnQueue = true;
+
+                    operator = token + "";
+                    numA = list.get(list.lastIndexOf(operator) - 1);
+                }
+                s = "";
+            }
+            // last token
+            if (i == tokens.length - 1 && s.length() > 0) {
+                list.add(s);
+                int listSize = list.size();
+
+                // if last calculation is mul or div, then pre compute it
+                String op = list.get(listSize - 2);
+                if (op.equals("*") || op.equals("/")) {
+                    numA = list.get(listSize - 3);
+                    operator = op;
+                    numB = list.get(listSize - 1);
+
+                    list.set(list.size() - 3, eval(numA, operator, numB));
+                    list.remove(list.size() - 2);
+                    list.remove(list.size() - 1);
+                }
             }
         }
-        result = eval(numbers[0], operation, numbers[1]);
-
-        return result;
+        // go through list and solve
+        // no mul or div should be there, only add and sub
+        while (list.size() > 2) {
+            String na = list.get(0);
+            String op = list.get(1);
+            String nb = list.get(2);
+            list.set(0, eval(na, op, nb));
+            list.remove(2);
+            list.remove(1);
+        }
+        return list.get(0);
     }
 
-    public static String eval(String a, char operation, String b) {
+    private static String eval(String a, String operator, String b) {
+        double r = 0;
         double da = Double.parseDouble(a);
         double db = Double.parseDouble(b);
-        String result = "";
 
-        switch (operation) {
-            case '+': {
-                result = Double.toString(da + db);
+        switch (operator) {
+            case "/":
+                r += da / db;
                 break;
-            }
-            case '-': {
-                result = Double.toString(da - db);
+            case "*":
+                r += da * db;
                 break;
-            }
-            case '*': {
-                result = Double.toString(da * db);
+            case "-":
+                r += da - db;
                 break;
-            }
-            case '/': {
-                result = Double.toString(da / db);
+            case "+":
+                r += da + db;
                 break;
-            }
-            default: {
-                result = "Not an operation";
-                break;
-            }
         }
-        return result;
+
+        return Double.toString(r);
     }
 }
