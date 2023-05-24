@@ -1,10 +1,17 @@
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class Solver {
 
-    public static String solve(String equation) {
-        char[] tokens = equation.toCharArray();
+    public static String solve(String expression) {
+        char[] tokens = expression.toCharArray();
+
         ArrayList<String> list = new ArrayList<String>();
+
+        if (!valid(expression))
+            return expression;
 
         String s = "";
         String numA = "";
@@ -99,6 +106,26 @@ public class Solver {
                 break;
         }
 
-        return Double.toString(r);
+        DecimalFormatSymbols dfs = new DecimalFormatSymbols(Locale.getDefault());
+        dfs.setDecimalSeparator('.');
+        DecimalFormat df = new DecimalFormat("0.########", dfs);
+        return df.format(r);
+    }
+
+    private static boolean valid(String expression) {
+        if (expression.length() == 0) {
+            return false;
+        }
+        if ((!expression.contains("+")
+                && !expression.contains("-")
+                && !expression.contains("*")
+                && !expression.contains("/"))) {
+            return false;
+        }
+        char lastChar = expression.charAt(expression.length() - 1);
+        if (!Character.isDigit(lastChar)) {
+            return false;
+        }
+        return true;
     }
 }

@@ -1,66 +1,65 @@
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import javax.swing.border.BevelBorder;
+
 import java.lang.Math;
 
 public class Calculator {
 
     private JFrame window;
     private JTextField textField;
-
     private int width, height;
-
     private boolean solved = false;
-
     private JButton[] buttons;
 
-    public Calculator(int w, int h) {
-        final int NUM_BUTTONS = 20;
-        final int BUTTON_COLS = 4;
-        final int BUTTON_ROWS = (int) Math.ceilDiv(NUM_BUTTONS, BUTTON_COLS);
+    final int NUM_BUTTONS = 20;
+    final int BUTTON_COLS = 4;
+    final int BUTTON_ROWS = (int) Math.ceil(NUM_BUTTONS / BUTTON_COLS);
 
+    public Calculator(int w, int h) {
         width = w;
         height = h;
 
+        // setup window
         window = new JFrame("Taschenrechner");
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setResizable(false);
         window.setUndecorated(true);
-        window.setSize(width, height);
+        window.setSize(width + 5, height + 5);
         window.setVisible(true);
         window.getContentPane().setBackground(Color.DARK_GRAY);
         window.setLocationRelativeTo(null);
-        window.getRootPane().setBorder(BorderFactory.createLineBorder(Color.BLACK, 5));
+        window.getRootPane().setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
         window.addKeyListener(new KeyListener() {
             public void keyTyped(KeyEvent e) {
-                onKeyPressed(e.getKeyChar());
             }
 
             public void keyPressed(KeyEvent e) {
-
+                onKeyPressed(e);
             }
 
             public void keyReleased(KeyEvent e) {
-
             }
         });
 
-        Font font = new Font("SansSerif", Font.BOLD, 20);
-
-        int tx = 0;// (int) (width * 0.08);
-        int ty = 0;// (int) (height * 0.03);
-        int tw = width;// (int) (width * 0.8);
+        // setup textField
+        int tx = 0;
+        int ty = 0;
+        int tw = width;
         int th = (int) (height * 0.15);
+        final Font fontTextField = new Font("SansSerif", Font.BOLD, (int) (th * 0.3));
         textField = new JTextField();
         textField.setEditable(false);
         textField.setBounds(tx, ty, tw, th);
-        textField.setHorizontalAlignment(JTextField.LEFT);
+        textField.setHorizontalAlignment(JTextField.CENTER);
         textField.setBackground(new Color(150, 150, 150));
-        textField.setFont(font);
-        textField.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        textField.setFont(fontTextField);
+        textField.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
         textField.setVisible(true);
         window.add(textField);
 
+        // setup buttons
         ActionListener numberButtonListener = new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 numberButtonPressed(((JButton) event.getSource()).getText());
@@ -90,7 +89,7 @@ public class Calculator {
         JButton bClr = new JButton("Clr");
         JButton bNeg = new JButton("(-)");
         JButton bEqu = new JButton("=");
-        JButton bPow = new JButton("Off");
+        JButton bOff = new JButton("Off");
         b1.addActionListener(numberButtonListener);
         b2.addActionListener(numberButtonListener);
         b3.addActionListener(numberButtonListener);
@@ -126,7 +125,7 @@ public class Calculator {
                 equalsButtonPressed();
             }
         });
-        bPow.addActionListener(new ActionListener() {
+        bOff.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 offButtonPressed();
             }
@@ -137,19 +136,22 @@ public class Calculator {
                 b4, b5, b6, bSub,
                 b7, b8, b9, bMul,
                 bNeg, b0, bP, bDiv,
-                bDel, bClr, bEqu, bPow
+                bDel, bClr, bEqu, bOff
         };
 
+        // place buttons
         int yOff = ty + th;
         int bw = (int) (width / BUTTON_COLS);
         int bh = (int) (height - yOff) / BUTTON_ROWS;
+        final Font fontButtons = new Font("SansSerif", Font.BOLD, (int) (bh * 0.3));
 
         for (int i = 0; i < NUM_BUTTONS; i++) {
             JButton b = buttons[i];
             b.setVisible(true);
             b.setBackground(new Color(200, 200, 200));
-            b.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-            b.setFont(font);
+            b.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
+            b.setFont(fontButtons);
+            b.setFocusable(false);
 
             int col = i % BUTTON_COLS;
             int row = Math.floorDiv(i, 4);
@@ -207,9 +209,29 @@ public class Calculator {
         window.dispatchEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSING));
     }
 
-    private void onKeyPressed(char key) {
+    private void onKeyPressed(KeyEvent keyEvent) {
+        char key = keyEvent.getKeyChar();
+        int keyCode = keyEvent.getExtendedKeyCode();
         if (Character.isDigit(key) || key == '.') {
             numberButtonPressed(key + "");
+        }
+        if (key == ',') {
+            numberButtonPressed(".");
+        }
+        if (key == '+' || key == '-' || key == '*' || key == '/') {
+            operatorButtonPressed(key + "");
+        }
+        if (keyCode == KeyEvent.VK_BACK_SPACE) {
+            deleteButtonPressed();
+        }
+        if (keyCode == KeyEvent.VK_ESCAPE) {
+            offButtonPressed();
+        }
+        if (key == 'c') {
+            clearButtonPressed();
+        }
+        if (key == '=' || keyCode == KeyEvent.VK_ENTER) {
+            equalsButtonPressed();
         }
     }
 }
