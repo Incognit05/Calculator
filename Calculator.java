@@ -94,6 +94,21 @@ public class Calculator {
                 operatorButtonPressed(((JButton) event.getSource()).getText());
             }
         };
+        MouseAdapter hoverEffect = new MouseAdapter() {
+            public void mouseEntered(MouseEvent event) {
+                JButton button = (JButton) event.getSource();
+                Color c = button.getBackground();
+                Color newColor = new Color(c.getRed() + 20, c.getGreen() + 20, c.getBlue() + 20);
+                button.setBackground(newColor);
+            }
+
+            public void mouseExited(MouseEvent event) {
+                JButton button = (JButton) event.getSource();
+                Color c = button.getBackground();
+                Color newColor = new Color(c.getRed() - 20, c.getGreen() - 20, c.getBlue() - 20);
+                button.setBackground(newColor);
+            }
+        };
         JButton b1 = new JButton("1");
         JButton b2 = new JButton("2");
         JButton b3 = new JButton("3");
@@ -114,6 +129,27 @@ public class Calculator {
         JButton bNeg = new JButton("(-)");
         JButton bEqu = new JButton("=");
         JButton bOff = new JButton("Off");
+        b1.addMouseListener(hoverEffect);
+        b2.addMouseListener(hoverEffect);
+        b3.addMouseListener(hoverEffect);
+        b4.addMouseListener(hoverEffect);
+        b5.addMouseListener(hoverEffect);
+        b5.addMouseListener(hoverEffect);
+        b6.addMouseListener(hoverEffect);
+        b7.addMouseListener(hoverEffect);
+        b8.addMouseListener(hoverEffect);
+        b9.addMouseListener(hoverEffect);
+        b0.addMouseListener(hoverEffect);
+        bAdd.addMouseListener(hoverEffect);
+        bSub.addMouseListener(hoverEffect);
+        bMul.addMouseListener(hoverEffect);
+        bDiv.addMouseListener(hoverEffect);
+        bP.addMouseListener(hoverEffect);
+        bDel.addMouseListener(hoverEffect);
+        bClr.addMouseListener(hoverEffect);
+        bNeg.addMouseListener(hoverEffect);
+        bEqu.addMouseListener(hoverEffect);
+        bOff.addMouseListener(hoverEffect);
         b1.addActionListener(numberButtonListener);
         b2.addActionListener(numberButtonListener);
         b3.addActionListener(numberButtonListener);
