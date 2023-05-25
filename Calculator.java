@@ -42,8 +42,19 @@ public class Calculator {
             public void keyReleased(KeyEvent e) {
             }
         });
+        window.addMouseMotionListener(new MouseMotionListener() {
+            public void mouseDragged(MouseEvent event) {
+                System.out.println("Dragging");
+                int x = event.getX();
+                int y = event.getY();
+                window.setLocation(window.getX() + x, window.getY() + y);
+            }
 
-        // setup textField
+            public void mouseMoved(MouseEvent event) {
+                System.out.println("Moving");
+            }
+        });
+
         int tx = 0;
         int ty = 0;
         int tw = width;
