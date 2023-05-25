@@ -113,17 +113,11 @@ public class Solver {
     }
 
     private static boolean valid(String expression) {
-        if (expression.length() == 0) {
-            return false;
-        }
-        if ((!expression.contains("+")
-                && !expression.contains("-")
-                && !expression.contains("*")
-                && !expression.contains("/"))) {
-            return false;
-        }
         char lastChar = expression.charAt(expression.length() - 1);
-        if (!Character.isDigit(lastChar)) {
+        if (expression.length() == 0
+                || (!expression.contains("+") && !expression.contains("-") && !expression.contains("*")
+                        && !expression.contains("/"))
+                || !Character.isDigit(lastChar)) {
             return false;
         }
         return true;

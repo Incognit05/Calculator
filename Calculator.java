@@ -12,21 +12,33 @@ public class Calculator {
     private int width, height;
     private boolean solved = false;
     private JButton[] buttons;
+    private int textFieldHeight;
 
-    final int NUM_BUTTONS = 20;
-    final int BUTTON_COLS = 4;
-    final int BUTTON_ROWS = (int) Math.ceil(NUM_BUTTONS / BUTTON_COLS);
+    private final int NUM_BUTTONS = 20;
+    private final int BUTTON_COLS = 4;
+    private final int BUTTON_ROWS = (int) Math.ceil(NUM_BUTTONS / BUTTON_COLS);
+    private final int BAR_HEIGHT = 25;
+
+    private int mouseXLastFrame, mouseYLastFrame;
 
     public Calculator(int w, int h) {
         width = w;
         height = h;
+        textFieldHeight = (int) (height * 0.15);
 
-        // setup window
+        setupWindow();
+        setupTextField();
+        setupButtons();
+
+        window.repaint();
+    }
+
+    private void setupWindow() {
         window = new JFrame("Taschenrechner");
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setResizable(false);
         window.setUndecorated(true);
-        window.setSize(width + 5, height + 5);
+        window.setSize(width + 5, height + 5 + BAR_HEIGHT);
         window.setVisible(true);
         window.getContentPane().setBackground(Color.DARK_GRAY);
         window.setLocationRelativeTo(null);
@@ -44,33 +56,34 @@ public class Calculator {
         });
         window.addMouseMotionListener(new MouseMotionListener() {
             public void mouseDragged(MouseEvent event) {
-                System.out.println("Dragging");
                 int x = event.getX();
                 int y = event.getY();
-                window.setLocation(window.getX() + x, window.getY() + y);
+                window.setLocation(window.getX() + (x - mouseXLastFrame), window.getY() + (y - mouseYLastFrame));
             }
 
             public void mouseMoved(MouseEvent event) {
-                System.out.println("Moving");
+                mouseXLastFrame = event.getX();
+                mouseYLastFrame = event.getY();
             }
         });
+    }
 
-        int tx = 0;
-        int ty = 0;
+    private void setupTextField() {
+        int ty = BAR_HEIGHT;
         int tw = width;
-        int th = (int) (height * 0.15);
-        final Font fontTextField = new Font("SansSerif", Font.BOLD, (int) (th * 0.3));
+        final Font fontTextField = new Font("SansSerif", Font.BOLD, (int) (textFieldHeight * 0.3));
         textField = new JTextField();
         textField.setEditable(false);
-        textField.setBounds(tx, ty, tw, th);
+        textField.setBounds(0, ty, tw, textFieldHeight);
         textField.setHorizontalAlignment(JTextField.CENTER);
         textField.setBackground(new Color(150, 150, 150));
         textField.setFont(fontTextField);
         textField.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
         textField.setVisible(true);
         window.add(textField);
+    }
 
-        // setup buttons
+    private void setupButtons() {
         ActionListener numberButtonListener = new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 numberButtonPressed(((JButton) event.getSource()).getText());
@@ -150,10 +163,9 @@ public class Calculator {
                 bDel, bClr, bEqu, bOff
         };
 
-        // place buttons
-        int yOff = ty + th;
+        int yOff = textFieldHeight + BAR_HEIGHT;
         int bw = (int) (width / BUTTON_COLS);
-        int bh = (int) (height - yOff) / BUTTON_ROWS;
+        int bh = (int) (height + BAR_HEIGHT - yOff) / BUTTON_ROWS;
         final Font fontButtons = new Font("SansSerif", Font.BOLD, (int) (bh * 0.3));
 
         for (int i = 0; i < NUM_BUTTONS; i++) {
@@ -172,7 +184,6 @@ public class Calculator {
                     bw, bh);
             window.add(b);
         }
-        window.repaint();
     }
 
     private void numberButtonPressed(String number) {
